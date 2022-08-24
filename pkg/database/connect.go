@@ -3,17 +3,19 @@ package database
 import (
 	"context"
 	"fmt"
+	util "kanban/pkg/utils"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var DB *mongo.Client
+func ConnectDB() *mongo.Client {
+	config := util.LoadConfig()
 
-func ConnectDB(uri string) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
+	client, err := mongo.NewClient(options.Client().ApplyURI(config.MongoUri))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,12 +24,15 @@ func ConnectDB(uri string) {
 	err = client.Connect(ctx)
 	if err != nil {
 		log.Fatal(err)
+		os.Exit(3)
 	}
-	DB = client
 	fmt.Println("Connect to MongoDB database successfully!")
+	return client
 }
 
+var DB *mongo.Client = ConnectDB()
+
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	collection := client.Database("userAPI").Collection(collectionName)
+	collection := client.Database("kanban").Collection(collectionName)
 	return collection
 }

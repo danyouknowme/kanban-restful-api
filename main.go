@@ -1,27 +1,21 @@
 package main
 
 import (
-	"os"
-
 	"kanban/pkg/database"
 	"kanban/pkg/routes"
+	util "kanban/pkg/utils"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/joho/godotenv"
-	_ "github.com/joho/godotenv"
 )
 
 func main() {
 	router := gin.Default()
 
-	_ = godotenv.Load(".env")
+	config := util.LoadConfig()
 
-	mongoUri := os.Getenv("MONGO_URI")
-	database.ConnectDB(mongoUri)
+	database.ConnectDB()
 
 	routes.BoardRoute(router)
 
-	port := os.Getenv("PORT")
-	router.Run(":" + port)
+	router.Run(":" + config.Port)
 }
