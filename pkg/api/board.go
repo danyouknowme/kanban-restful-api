@@ -22,7 +22,7 @@ func GetAllBoards() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		userId := c.Query("userId")
-		var boardList []BoardResponse
+		var boardList []models.BoardResponse
 		defer cancel()
 
 		results, err := boardCollection.Find(ctx, bson.M{"user_id": userId})
@@ -34,20 +34,20 @@ func GetAllBoards() gin.HandlerFunc {
 		defer results.Close(ctx)
 		for results.Next(ctx) {
 			var board models.Board
-			boardTask := make(map[string]BoardTaskResponse)
+			boardTask := make(map[string]models.BoardTaskResponse)
 			if err = results.Decode(&board); err != nil {
 				c.JSON(http.StatusInternalServerError, err.Error())
 			}
 
 			for _, boardtask := range board.BoardTask {
-				boardTask[boardtask.Id] = BoardTaskResponse{
+				boardTask[boardtask.Id] = models.BoardTaskResponse{
 					TaskName: boardtask.TaskName,
 					TaskList: boardtask.TaskList,
 					TagColor: boardtask.TagColor,
 				}
 			}
 
-			responseBoard := BoardResponse{
+			responseBoard := models.BoardResponse{
 				Id:        board.Id,
 				Name:      board.Name,
 				UserId:    board.UserId,
@@ -112,7 +112,7 @@ func CreateNewBoardTask() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var board models.Board
-		var req CreateBoardTaskRequest
+		var req models.CreateBoardTaskRequest
 		userId := c.Query("userId")
 		boardId := c.Query("boardId")
 		defer cancel()
@@ -160,22 +160,4 @@ func CreateNewBoardTask() gin.HandlerFunc {
 
 		c.JSON(http.StatusCreated, board)
 	}
-}
-
-type BoardResponse struct {
-	Id        primitive.ObjectID           `bson:"_id" json:"id"`
-	Name      string                       `bson:"name" json:"boardName"`
-	UserId    string                       `bson:"user_id" json:"userId"`
-	BoardTask map[string]BoardTaskResponse `bson:"board_task" json:"boardTask"`
-}
-
-type BoardTaskResponse struct {
-	TaskName string        `bson:"task_name" json:"taskName"`
-	TaskList []models.Task `bson:"task_list" json:"taskList"`
-	TagColor string        `bson:"tag_color" json:"tagColor"`
-}
-
-type CreateBoardTaskRequest struct {
-	TaskName string `bson:"task_name" json:"taskName"`
-	TagColor string `bson:"tag_color" json:"tagColor"`
 }
