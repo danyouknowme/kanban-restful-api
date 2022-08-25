@@ -7,6 +7,7 @@ import (
 )
 
 func BoardRoute(router *gin.Engine) {
-	router.GET("/boards/:userId", api.GetAllBoards())
+	router.GET("/boards", api.GetAllBoards())
 	router.POST("/boards", api.CreateNewBoard())
+	router.POST("/boards/task", api.CreateNewBoardTask())
 }
