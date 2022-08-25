@@ -8,12 +8,14 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var boardCollection *mongo.Collection = database.GetCollection(database.DB, "boards")
+var validate = validator.New()
 
 func GetAllBoards() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -54,6 +56,40 @@ func GetAllBoards() gin.HandlerFunc {
 			boardList = append(boardList, responseBoard)
 		}
 		c.JSON(http.StatusOK, boardList)
+	}
+}
+
+func CreateNewBoard() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var board models.Board
+		defer cancel()
+
+		// validate the request body
+		if err := c.BindJSON(&board); err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+			return
+		}
+
+		if validationErr := validate.Struct(&board); validationErr != nil {
+			c.JSON(http.StatusBadRequest, validationErr.Error())
+			return
+		}
+
+		newBoard := models.Board{
+			Id:        primitive.NewObjectID(),
+			Name:      board.Name,
+			UserId:    board.UserId,
+			BoardTask: []models.BoardTask{},
+		}
+
+		result, err := boardCollection.InsertOne(ctx, newBoard)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		c.JSON(http.StatusCreated, result)
 	}
 }
 

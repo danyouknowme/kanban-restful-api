@@ -8,4 +8,5 @@ import (
 
 func BoardRoute(router *gin.Engine) {
 	router.GET("/boards/:userId", api.GetAllBoards())
+	router.POST("/boards", api.CreateNewBoard())
 }
