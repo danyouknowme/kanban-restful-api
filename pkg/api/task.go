@@ -174,3 +174,55 @@ func EditTaskListDifferentColumn() gin.HandlerFunc {
 		c.JSON(http.StatusOK, board)
 	}
 }
+
+func EditSubtaskStatus() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var req models.EditSubtaskStatusRequest
+		userId := c.Query("userId")
+		boardId := c.Query("boardId")
+		defer cancel()
+
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+			return
+		}
+
+		board, err := GetBoardById(ctx, boardId)
+		if err != nil {
+			c.JSON(http.StatusNotFound, err.Error())
+			return
+		}
+
+		if board.UserId != userId {
+			c.JSON(http.StatusForbidden, gin.H{"message": "you don't allow to do this"})
+			return
+		}
+
+		boardTask := board.BoardTask[req.BoardTaskId]
+		for _, task := range boardTask.TaskList {
+			if task.Id == req.TaskId {
+				task.Subtasks[req.SubTaskIndex].IsDone = req.Status
+				break
+			}
+		}
+
+		updatedBoardTask := bson.M{
+			"$set": bson.M{
+				"board_task": board.BoardTask,
+			},
+		}
+
+		_, err = boardCollection.UpdateOne(
+			ctx,
+			bson.M{"_id": board.Id},
+			updatedBoardTask,
+		)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		c.JSON(http.StatusOK, board)
+	}
+}

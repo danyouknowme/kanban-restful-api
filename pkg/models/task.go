@@ -30,3 +30,10 @@ type EditTaskListDifferentColumnRequest struct {
 	SourceItems      []Task `json:"sourceItems"`
 	DestinationItems []Task `json:"destinationItems"`
 }
+
+type EditSubtaskStatusRequest struct {
+	BoardTaskId  string `json:"boardTaskId"`
+	TaskId       string `json:"taskId"`
+	SubTaskIndex int    `json:"subtaskIndex"`
+	Status       bool   `json:"status"`
+}
