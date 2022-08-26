@@ -8,4 +8,6 @@ import (
 
 func TaskRoute(router *gin.Engine) {
 	router.POST("/tasks", api.CreateTask())
+	router.PUT("/tasks/list/same", api.EditTaskListSameColumn())
+	router.PUT("/tasks/list/diff", api.EditTaskListDifferentColumn())
 }

@@ -18,3 +18,15 @@ type CreateTaskRequest struct {
 	Description string   `json:"description"`
 	Subtasks    []string `json:"subtasks"`
 }
+
+type EditTaskListSameColumnRequest struct {
+	BoardTaskId string `json:"boardTaskId"`
+	TaskList    []Task `json:"taskList"`
+}
+
+type EditTaskListDifferentColumnRequest struct {
+	SourceId         string `json:"sourceId"`
+	DestinationId    string `json:"destinationId"`
+	SourceItems      []Task `json:"sourceItems"`
+	DestinationItems []Task `json:"destinationItems"`
+}
