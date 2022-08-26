@@ -5,18 +5,21 @@ import (
 	"kanban/pkg/routes"
 	"kanban/pkg/utils"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	router := gin.Default()
+	app := gin.Default()
 
 	config := utils.LoadConfig()
 
 	database.ConnectDB()
 
-	routes.BoardRoute(router)
-	routes.TaskRoute(router)
+	app.Use(cors.Default())
 
-	router.Run(":" + config.Port)
+	routes.BoardRoute(app)
+	routes.TaskRoute(app)
+
+	app.Run(":" + config.Port)
 }
