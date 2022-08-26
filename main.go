@@ -16,6 +16,7 @@ func main() {
 	database.ConnectDB()
 
 	routes.BoardRoute(router)
+	routes.TaskRoute(router)
 
 	router.Run(":" + config.Port)
 }

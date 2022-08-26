@@ -11,3 +11,10 @@ type SubTask struct {
 	Name   string `bson:"name" json:"name"`
 	IsDone bool   `bson:"is_done" json:"isDone"`
 }
+
+type CreateTaskRequest struct {
+	BoardTaskId string   `json:"boardTaskId"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Subtasks    []string `json:"subtasks"`
+}
