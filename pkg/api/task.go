@@ -4,7 +4,6 @@ import (
 	"context"
 	"kanban/pkg/models"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,7 +35,7 @@ func CreateTask() gin.HandlerFunc {
 			return
 		}
 
-		var newSubTask []models.SubTask
+		newSubTask := []models.SubTask{}
 		for _, subTask := range req.Subtasks {
 			newSubTask = append(newSubTask, models.SubTask{
 				Name:   subTask,
@@ -51,14 +50,9 @@ func CreateTask() gin.HandlerFunc {
 			Subtasks:    newSubTask,
 		}
 
-		for _, boardTask := range board.BoardTask {
-			if boardTask.Id == req.BoardTaskId {
-				boardTask.TaskList = append(boardTask.TaskList, task)
-				boardTaskId, _ := strconv.Atoi(boardTask.Id)
-				board.BoardTask[boardTaskId-1] = boardTask
-				break
-			}
-		}
+		boardTask := board.BoardTask[req.BoardTaskId]
+		boardTask.TaskList = append(boardTask.TaskList, task)
+		board.BoardTask[req.BoardTaskId] = boardTask
 
 		updatedBoardTask := bson.M{
 			"$set": bson.M{
@@ -79,3 +73,11 @@ func CreateTask() gin.HandlerFunc {
 		c.JSON(http.StatusCreated, board)
 	}
 }
+
+// func EditTaskStatus() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+// 		defer cancel()
+// 	}
+// }

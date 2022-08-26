@@ -3,7 +3,7 @@ package main
 import (
 	"kanban/pkg/database"
 	"kanban/pkg/routes"
-	util "kanban/pkg/utils"
+	"kanban/pkg/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,7 +11,7 @@ import (
 func main() {
 	router := gin.Default()
 
-	config := util.LoadConfig()
+	config := utils.LoadConfig()
 
 	database.ConnectDB()
 

@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
-	util "kanban/pkg/utils"
+	"kanban/pkg/utils"
 	"log"
 	"os"
 	"time"
@@ -13,7 +13,7 @@ import (
 )
 
 func ConnectDB() *mongo.Client {
-	config := util.LoadConfig()
+	config := utils.LoadConfig()
 
 	client, err := mongo.NewClient(options.Client().ApplyURI(config.MongoUri))
 	if err != nil {

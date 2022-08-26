@@ -22,7 +22,7 @@ func GetAllBoards() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		userId := c.Query("userId")
-		var boardList []models.BoardResponse
+		var boards []models.Board
 		defer cancel()
 
 		results, err := boardCollection.Find(ctx, bson.M{"user_id": userId})
@@ -34,29 +34,13 @@ func GetAllBoards() gin.HandlerFunc {
 		defer results.Close(ctx)
 		for results.Next(ctx) {
 			var board models.Board
-			boardTask := make(map[string]models.BoardTaskResponse)
 			if err = results.Decode(&board); err != nil {
 				c.JSON(http.StatusInternalServerError, err.Error())
 			}
 
-			for _, boardtask := range board.BoardTask {
-				boardTask[boardtask.Id] = models.BoardTaskResponse{
-					TaskName: boardtask.TaskName,
-					TaskList: boardtask.TaskList,
-					TagColor: boardtask.TagColor,
-				}
-			}
-
-			responseBoard := models.BoardResponse{
-				Id:        board.Id,
-				Name:      board.Name,
-				UserId:    board.UserId,
-				BoardTask: boardTask,
-			}
-
-			boardList = append(boardList, responseBoard)
+			boards = append(boards, board)
 		}
-		c.JSON(http.StatusOK, boardList)
+		c.JSON(http.StatusOK, boards)
 	}
 }
 
@@ -95,7 +79,7 @@ func CreateNewBoard() gin.HandlerFunc {
 			Id:        primitive.NewObjectID(),
 			Name:      req.Name,
 			UserId:    userId,
-			BoardTask: []models.BoardTask{},
+			BoardTask: map[string]models.BoardTask{},
 		}
 
 		_, err := boardCollection.InsertOne(ctx, newBoard)
@@ -140,7 +124,7 @@ func CreateNewBoardTask() gin.HandlerFunc {
 			TagColor: req.TagColor,
 		}
 
-		board.BoardTask = append(board.BoardTask, responseBoardTask)
+		board.BoardTask[responseBoardTask.Id] = responseBoardTask
 
 		updatedBoardTask := bson.M{
 			"$set": bson.M{
@@ -150,7 +134,7 @@ func CreateNewBoardTask() gin.HandlerFunc {
 
 		_, err = boardCollection.UpdateOne(
 			ctx,
-			bson.M{"id": board.Id},
+			bson.M{"_id": board.Id},
 			updatedBoardTask,
 		)
 		if err != nil {
