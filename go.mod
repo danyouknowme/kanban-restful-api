@@ -9,4 +9,5 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.10.1
+	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
 )

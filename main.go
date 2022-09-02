@@ -12,7 +12,7 @@ import (
 func main() {
 	app := gin.Default()
 
-	config := utils.LoadConfig()
+	utils.LoadConfig()
 
 	database.ConnectDB()
 
@@ -21,5 +21,5 @@ func main() {
 	routes.BoardRoute(app)
 	routes.TaskRoute(app)
 
-	app.Run(":" + config.Port)
+	app.Run(":" + utils.AppConfig.Port)
 }
