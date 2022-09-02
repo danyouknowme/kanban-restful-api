@@ -16,6 +16,8 @@ type Config struct {
 
 var AppConfig Config
 
+const OauthGoogleUrlAPI = "https://www.googleapis.com/oauth2/v2/userinfo?access_token="
+
 func LoadConfig() {
 	_ = godotenv.Load(".env")
 
@@ -26,7 +28,7 @@ func LoadConfig() {
 		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 		Endpoint:     google.Endpoint,
-		RedirectURL:  "http://localhost:8080/google_callback",
+		RedirectURL:  "http://localhost:8080/google/callback",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",

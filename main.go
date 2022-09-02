@@ -20,6 +20,7 @@ func main() {
 
 	routes.BoardRoute(app)
 	routes.TaskRoute(app)
+	routes.AuthRoute(app)
 
 	app.Run(":" + utils.AppConfig.Port)
 }
