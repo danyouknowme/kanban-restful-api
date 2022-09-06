@@ -1,6 +1,6 @@
 module kanban
 
-go 1.16
+go 1.17
 
 require (
 	github.com/gin-contrib/cors v1.4.0
